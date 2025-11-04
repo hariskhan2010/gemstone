@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Star } from "lucide-react";
 
-interface Product {
+export interface Product {
   id: number;
   name: string;
   description: string;
