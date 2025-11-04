@@ -1,6 +1,16 @@
 'use client';
-import CollectionsPage from '../components/collections';
+import FeaturedProducts from '../components/featured-products';
+import Navbar from '../components/navbar';
+// import GemCollectionPage from '../components/gem-collection';
 
 export default function Collections() {
-  return <CollectionsPage />;
+  return(
+    <>
+  <Navbar/>
+  <FeaturedProducts />;
+  
+  </> 
+  )
+  
+
 }

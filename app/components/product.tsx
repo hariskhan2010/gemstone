@@ -28,7 +28,7 @@ export default function ProductCard({ product }: { product: Product }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       whileHover={{ y: -10 }}
-      className="bg-gradient-to-br from-gray-900 to-black border border-amber-800/30 rounded-2xl overflow-hidden shadow-2xl hover:shadow-amber-500/20 transition-all duration-300 group"
+      className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 border border-amber-700/50 rounded-2xl overflow-hidden shadow-2xl shadow-amber-900/20 hover:shadow-amber-500/30 transition-all duration-300 group"
     >
       <div className="relative h-64 overflow-hidden">
         <Image
@@ -36,23 +36,28 @@ export default function ProductCard({ product }: { product: Product }) {
           alt={product.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"
+          onError={(e) => {
+            // Fallback image if the image fails to load
+            const target = e.target as HTMLImageElement;
+            target.src = "/placeholder-gemstone.jpg";
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
+        <div className="absolute inset-0  from-black/70 to-transparent opacity-80"></div>
         
         {/* Badges */}
         <div className="absolute top-4 left-4 flex gap-2">
           {isNew && (
-            <span className="px-2 py-1 bg-amber-600 text-white text-xs font-bold rounded-full">
+            <span className="px-2 py-1 bg-amber-500 text-gray-900 text-xs font-bold rounded-full">
               NEW
             </span>
           )}
           {isOnSale && (
-            <span className="px-2 py-1 bg-red-600 text-white text-xs font-bold rounded-full">
+            <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
               SALE
             </span>
           )}
           {product.isFeatured && (
-            <span className="px-2 py-1 bg-purple-600 text-white text-xs font-bold rounded-full">
+            <span className="px-2 py-1 bg-purple-500 text-white text-xs font-bold rounded-full">
               FEATURED
             </span>
           )}
@@ -72,17 +77,17 @@ export default function ProductCard({ product }: { product: Product }) {
               {[...Array(5)].map((_, i) => (
                 <Star 
                   key={i} 
-                  className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'text-amber-400 fill-amber-400' : 'text-gray-500'}`} 
+                  className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'text-amber-400 fill-amber-400' : 'text-gray-400'}`} 
                 />
               ))}
             </div>
-            <span className="text-gray-400 text-sm ml-2">({product.rating})</span>
+            <span className="text-gray-300 text-sm ml-2">({product.rating})</span>
           </div>
           <div className="flex items-center mt-2">
             {isOnSale ? (
               <>
                 <span className="text-amber-400 font-bold text-lg">${product.price}</span>
-                <span className="text-gray-500 line-through text-sm ml-2">${product.originalPrice}</span>
+                <span className="text-gray-400 line-through text-sm ml-2">${product.originalPrice}</span>
               </>
             ) : (
               <span className="text-amber-400 font-bold text-lg">${product.price}</span>
@@ -92,18 +97,18 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
       
       <div className="p-5">
-        <div className="flex justify-between text-sm text-gray-400 mb-3">
-          <span>Category: {product.category}</span>
-          <span>{product.weight}</span>
+        <div className="flex justify-between text-sm text-gray-300 mb-3">
+          <span className="text-amber-200">Category: {product.category}</span>
+          <span className="text-gray-400">{product.weight}</span>
         </div>
         <p className="text-gray-300 text-sm mb-4 line-clamp-2">{product.description}</p>
         <div className="flex justify-between items-center">
-          <span className="text-xs text-gray-500">Origin: {product.origin}</span>
+          <span className="text-xs text-gray-400">Origin: {product.origin}</span>
           <div className="flex gap-2">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2 bg-gray-800 hover:bg-amber-600 rounded-full transition-colors"
+              className="p-2 bg-gray-700/80 hover:bg-amber-600 rounded-full transition-colors"
               title="Add to Cart"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
