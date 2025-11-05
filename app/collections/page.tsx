@@ -1,15 +1,13 @@
 'use client';
-import FeaturedProducts from '../components/featured-products';
+import GemJewelryCollection from '../components/gem-jewelry-collection';
 import Navbar from '../components/navbar';
-// import GemCollectionPage from '../components/gem-collection';
 
 export default function Collections() {
   return(
     <>
-  <Navbar/>
-  <FeaturedProducts />;
-  
-  </> 
+      <Navbar/>
+      <GemJewelryCollection />
+    </> 
   )
   
 

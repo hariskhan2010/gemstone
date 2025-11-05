@@ -2,10 +2,10 @@
 import Navbar from "./components/navbar";
 import Hero from "./components/hero";
 import AboutPage from "./components/about";
-import OrderPage from "./components/order";
 import FeaturedProducts from "./components/featured-products";
 import Testimonials from "./components/testimonials";
 import Newsletter from "./components/newsletter";
+import CustomGemCollection from "./components/custom-gem-collection";
 
 export default function Home() {
   return (
@@ -13,10 +13,10 @@ export default function Home() {
       <Navbar />
       <Hero />
       <FeaturedProducts />
+      <CustomGemCollection />
       <Testimonials />
       <Newsletter />
       <AboutPage />
-      <OrderPage />
     </>
   );
 }

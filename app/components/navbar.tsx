@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingCart } from "lucide-react";
 import Image from "next/image";
+import { useCart } from "../context/cart-context";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { getTotalItems } = useCart();
 
   return (
     <nav className="fixed top-0 left-0 w-full backdrop-blur-md border-b border-amber-800/30 z-50 h-20">
@@ -48,12 +50,19 @@ export default function Navbar() {
               About
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
             </Link>
-            <Link href="/order" className="hover:text-amber-400 transition flex items-center h-full text-lg font-medium relative group">
-              Order
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
             <Link href="/contact" className="hover:text-amber-400 transition flex items-center h-full text-lg font-medium relative group">
               Contact
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
+            </Link>
+            
+            {/* Cart Icon with Item Count */}
+            <Link href="/cart" className="relative flex items-center gap-1 hover:text-amber-400 transition flex items-center h-full text-lg font-medium relative group">
+              <ShoppingCart className="w-6 h-6" />
+              {getTotalItems() > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {getTotalItems()}
+                </span>
+              )}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
             </Link>
           </div>
@@ -76,8 +85,13 @@ export default function Navbar() {
             <Link href="/" onClick={() => setMenuOpen(false)} className="hover:text-amber-400 text-xl font-medium transition">Home</Link>
             <Link href="/collections" onClick={() => setMenuOpen(false)} className="hover:text-amber-400 text-xl font-medium transition">Collections</Link>
             <Link href="/about" onClick={() => setMenuOpen(false)} className="hover:text-amber-400 text-xl font-medium transition">About</Link>
-            <Link href="/order" onClick={() => setMenuOpen(false)} className="hover:text-amber-400 text-xl font-medium transition">Order</Link>
             <Link href="/contact" onClick={() => setMenuOpen(false)} className="hover:text-amber-400 text-xl font-medium transition">Contact</Link>
+            
+            {/* Cart Link for Mobile */}
+            <Link href="/cart" onClick={() => setMenuOpen(false)} className="hover:text-amber-400 text-xl font-medium transition flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5" />
+              Cart {getTotalItems() > 0 && `(${getTotalItems()})`}
+            </Link>
           </div>
         </div>
       )}

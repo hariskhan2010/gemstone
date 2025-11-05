@@ -3,13 +3,16 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Star, Heart, ShoppingCart, Package, MapPin, RotateCcw, Shield } from 'lucide-react';
-import { GemstoneProduct } from '../components/gem-collection';
+import { useCart } from '../../context/cart-context';
+import { GemstoneProduct } from '../../components/gem-collection';
+import Link from 'next/link';
 
 export default function GemstoneDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState<GemstoneProduct | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  const { addToCart, getTotalItems } = useCart();
 
   useEffect(() => {
     // This would be replaced by an actual API call to fetch the product
@@ -176,8 +179,7 @@ export default function GemstoneDetail() {
   }
 
   const handleAddToCart = () => {
-    // In a real app, this would dispatch to a cart state management solution
-    alert(`${product.name} added to cart!`);
+    addToCart({...product, quantity});
   };
 
   return (
@@ -293,6 +295,20 @@ export default function GemstoneDetail() {
                     {product.inStock ? 'Add to Cart' : 'Out of Stock'}
                   </button>
                 </div>
+                
+                {getTotalItems() > 0 && (
+                  <div className="mt-4 text-center">
+                    <Link 
+                      href="/cart" 
+                      className="text-amber-400 hover:text-amber-300 font-medium text-sm inline-flex items-center gap-1"
+                    >
+                      View Cart ({getTotalItems()} items)
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
+                )}
                 
                 <div className="mt-8 pt-6 border-t border-amber-800/30">
                   <h3 className="font-semibold text-amber-400 mb-4">Product Services</h3>

@@ -1,18 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Minus, Plus, Trash2, Package, CreditCard, MapPin, User } from "lucide-react";
-import { GemstoneProduct, CartItem } from "./gem-collection";
+import { useCart } from "../context/cart-context";
+import Link from "next/link";
 
-interface CartPageProps {
-  cartItems: CartItem[];
-  updateQuantity: (productId: number, quantity: number) => void;
-  removeFromCart: (productId: number) => void;
-  getTotalPrice: () => number;
-}
-
-export default function CartPage({ cartItems, updateQuantity, removeFromCart, getTotalPrice }: CartPageProps) {
+export default function CartPage() {
+  const { cartItems, updateQuantity, removeFromCart, getTotalPrice } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   
   const handleCheckout = () => {
@@ -20,8 +15,6 @@ export default function CartPage({ cartItems, updateQuantity, removeFromCart, ge
     // Simulate processing
     setTimeout(() => {
       setIsProcessing(false);
-      alert("Redirecting to checkout process...");
-      // In a real app, this would redirect to the checkout page
     }, 1500);
   };
 
@@ -47,12 +40,12 @@ export default function CartPage({ cartItems, updateQuantity, removeFromCart, ge
             <Package className="h-16 w-16 text-amber-400 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-amber-400 mb-2">Your Cart is Empty</h3>
             <p className="text-gray-400 mb-6">Add some beautiful gemstones to your collection</p>
-            <a 
+            <Link 
               href="/collections" 
               className="px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold rounded-lg hover:from-amber-700 hover:to-amber-800 transition-all"
             >
               Browse Collection
-            </a>
+            </Link>
           </motion.div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -151,25 +144,27 @@ export default function CartPage({ cartItems, updateQuantity, removeFromCart, ge
                   </div>
                 </div>
                 
-                <button
-                  onClick={handleCheckout}
-                  disabled={isProcessing}
-                  className={`w-full py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold rounded-lg hover:from-amber-700 hover:to-amber-800 transition-all shadow-lg shadow-amber-500/30 flex items-center justify-center gap-2 ${
-                    isProcessing ? 'opacity-75 cursor-not-allowed' : ''
-                  }`}
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="h-5 w-5" />
-                      Proceed to Checkout
-                    </>
-                  )}
-                </button>
+                <Link href="/checkout">
+                  <button
+                    onClick={handleCheckout}
+                    disabled={isProcessing}
+                    className={`w-full py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold rounded-lg hover:from-amber-700 hover:to-amber-800 transition-all shadow-lg shadow-amber-500/30 flex items-center justify-center gap-2 ${
+                      isProcessing ? 'opacity-75 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="h-5 w-5" />
+                        Proceed to Checkout
+                      </>
+                    )}
+                  </button>
+                </Link>
                 
                 <div className="mt-6 pt-6 border-t border-amber-800/50">
                   <div className="flex items-start gap-3 mb-4">

@@ -3,21 +3,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { CreditCard, MapPin, Package, CheckCircle, User, Mail, Phone, Calendar } from "lucide-react";
-import { GemstoneProduct, CartItem } from "./gem-collection";
+import { useCart } from "../context/cart-context";
+import Link from "next/link";
 
-interface OrderPageProps {
-  cartItems?: CartItem[];
-  getTotalPrice?: () => number;
-}
-
-export default function OrderPage({ cartItems = [], getTotalPrice }: OrderPageProps) {
-  // Default implementation of getTotalPrice if not provided
-  const defaultGetTotalPrice = () => {
-    if (!cartItems || cartItems.length === 0) return 0;
-    return cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
-  };
-  
-  const actualGetTotalPrice = getTotalPrice || defaultGetTotalPrice;
+export default function OrderPage() {
+  const { cartItems, getTotalPrice, removeFromCart } = useCart();
 
   const [step, setStep] = useState(1); // 1: shipping, 2: payment, 3: confirmation
   const [shippingInfo, setShippingInfo] = useState({
@@ -51,6 +41,13 @@ export default function OrderPage({ cartItems = [], getTotalPrice }: OrderPagePr
 
   const handlePlaceOrder = () => {
     // In a real application, you would process the payment and place the order
+    // For now, we'll just clear the cart and show the success page
+    // Since we don't have a clear cart function, we'll remove each item individually
+    cartItems.forEach(item => {
+      for (let i = 0; i < item.quantity; i++) {
+        removeFromCart(item.product.id);
+      }
+    });
     setOrderPlaced(true);
   };
 
@@ -75,12 +72,12 @@ export default function OrderPage({ cartItems = [], getTotalPrice }: OrderPagePr
           <div className="bg-gray-900/50 rounded-xl p-4 mb-8">
             <p className="text-amber-400 font-semibold">Order Number: GEM-{Math.floor(100000 + Math.random() * 900000)}</p>
           </div>
-          <a 
+          <Link 
             href="/collections" 
             className="px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold rounded-lg hover:from-amber-700 hover:to-amber-800 transition-all inline-block"
           >
             Continue Shopping
-          </a>
+          </Link>
         </motion.div>
       </div>
     );
@@ -160,22 +157,22 @@ export default function OrderPage({ cartItems = [], getTotalPrice }: OrderPagePr
               <div className="border-t border-amber-800/50 pt-4 mt-4">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-300">Subtotal</span>
-                  <span className="text-white">${actualGetTotalPrice().toFixed(2)}</span>
+                  <span className="text-white">${getTotalPrice().toFixed(2)}</span>
                 </div>
                 
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-300">Shipping</span>
-                  <span className="text-white">Free</span>
+                  <span className="text-white">Customer needs to pay</span>
                 </div>
                 
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-300">Taxes</span>
-                  <span className="text-white">$0.00</span>
+                  <span className="text-white">$1.00</span>
                 </div>
                 
                 <div className="border-t border-amber-800/50 pt-4 flex justify-between font-bold text-lg">
                   <span className="text-amber-400">Total</span>
-                  <span className="text-white">${actualGetTotalPrice().toFixed(2)}</span>
+                  <span className="text-white">${getTotalPrice().toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -246,7 +243,7 @@ export default function OrderPage({ cartItems = [], getTotalPrice }: OrderPagePr
                   </div>
                   
                   <div>
-                    <label className="block text-gray-300 mb-2">Address</label>
+                    <label className="block text-gray-300 mb-2">Shipping Address</label>
                     <input
                       type="text"
                       name="address"
@@ -303,7 +300,7 @@ export default function OrderPage({ cartItems = [], getTotalPrice }: OrderPagePr
                       value={shippingInfo.country}
                       onChange={handleInputChange}
                       className="w-full p-3 bg-gray-900/80 border border-amber-800/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      placeholder="United States"
+                        placeholder="United States"
                     />
                   </div>
                   
@@ -427,19 +424,19 @@ export default function OrderPage({ cartItems = [], getTotalPrice }: OrderPagePr
                     <h3 className="font-semibold text-amber-400 mb-2">Order Summary</h3>
                     <div className="flex justify-between mb-2">
                       <span className="text-gray-300">Subtotal</span>
-                      <span className="text-white">${actualGetTotalPrice().toFixed(2)}</span>
+                      <span className="text-white">${getTotalPrice().toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                       <span className="text-gray-300">Shipping</span>
-                      <span className="text-white">Free</span>
+                      <span className="text-white">Customer needs to pay</span>
                     </div>
                     <div className="flex justify-between mb-2">
                       <span className="text-gray-300">Taxes</span>
-                      <span className="text-white">$0.00</span>
+                      <span className="text-white">$1.00</span>
                     </div>
                     <div className="border-t border-amber-800/50 pt-2 flex justify-between font-bold">
                       <span className="text-amber-400">Total</span>
-                      <span className="text-white">${actualGetTotalPrice().toFixed(2)}</span>
+                      <span className="text-white">${getTotalPrice().toFixed(2)}</span>
                     </div>
                   </div>
                   

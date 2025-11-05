@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search, Filter, Star, Gem, ShoppingCart, Heart, Minus, Plus } from "lucide-react";
 import Link from "next/link";
+import { useCart } from "../context/cart-context";
 
 export interface GemstoneProduct {
   id: number;
@@ -37,8 +38,10 @@ export default function GemCollectionPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("featured");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
+  
+  // Using the global cart context
+  const { cartItems, addToCart: contextAddToCart, removeFromCart, updateQuantity, getTotalPrice, getTotalItems } = useCart();
 
   // Categories for filtering
   const categories = [
@@ -47,6 +50,84 @@ export default function GemCollectionPage() {
     "Carved Stones", "Jewelry Set"
   ];
 
+  // Jewelry products
+  const jewelryProducts: GemstoneProduct[] = [
+    {
+      id: 11,
+      name: "Ruby & Diamond Ring",
+      description: "Elegant 18K gold ring featuring a 2.0 carat premium ruby surrounded by brilliant diamonds.",
+      price: 4299.99,
+      originalPrice: 4999.99,
+      rating: 4.9,
+      category: "Jewelry Set",
+      weight: "5.0g",
+      origin: "Italy",
+      image: "https://images.unsplash.com/photo-1611934467150-0b056b8114c9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+      isFeatured: true,
+      inStock: true,
+      carat: "2.0 ct center",
+      cutType: "Round Brilliant",
+      color: "Vivid Red",
+      clarity: "Eye Clean",
+      dimensions: "6.5 US"
+    },
+    {
+      id: 12,
+      name: "Sapphire Earrings",
+      description: "Pair of stunning 18K white gold earrings with 1.5 carat sapphires and diamond accents.",
+      price: 3499.99,
+      rating: 4.8,
+      category: "Jewelry Set",
+      weight: "8.2g",
+      origin: "Switzerland",
+      image: "https://images.unsplash.com/photo-1599607759646-95c2d9f3ebc4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+      isFeatured: true,
+      inStock: true,
+      carat: "1.5 ct each",
+      cutType: "Princess",
+      color: "Royal Blue",
+      clarity: "Slightly Included",
+      dimensions: "14mm drop"
+    },
+    {
+      id: 13,
+      name: "Emerald Necklace",
+      description: "Beautiful 18K gold necklace featuring a 3.0 carat emerald with diamond chain.",
+      price: 6799.99,
+      originalPrice: 7499.99,
+      rating: 4.9,
+      category: "Jewelry Set",
+      weight: "12.0g",
+      origin: "Colombia",
+      image: "https://images.unsplash.com/photo-1605853484483-72275220ca2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+      isFeatured: true,
+      inStock: true,
+      carat: "3.0 ct center",
+      cutType: "Oval",
+      color: "Deep Green",
+      clarity: "Very Slightly Included",
+      dimensions: "18\" length"
+    },
+    {
+      id: 14,
+      name: "Tourmaline Bracelet",
+      description: "Exquisite bracelet showcasing 20 Paraiba tourmalines with 14K rose gold setting.",
+      price: 8499.99,
+      rating: 4.7,
+      category: "Jewelry Set",
+      weight: "10.5g",
+      origin: "Brazil",
+      image: "https://images.unsplash.com/photo-1599607761728-ec9130fbec22?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+      isFeatured: true,
+      inStock: true,
+      carat: "14 ct total",
+      cutType: "Mixed cuts",
+      color: "Electric Blue-Green",
+      clarity: "Eye Clean",
+      dimensions: "7\" length"
+    }
+  ];
+  
   // Initialize products with actual gemstone images and details
   useEffect(() => {
     const gemstoneProducts: GemstoneProduct[] = [
@@ -274,7 +355,12 @@ export default function GemCollectionPage() {
         result.sort((a, b) => b.rating - a.rating);
         break;
       case "carat":
-        result.sort((a, b) => parseFloat(b.carat) - parseFloat(a.carat));
+        result.sort((a, b) => {
+          // Extract numeric value from carat string for comparison
+          const aCarat = parseFloat(a.carat) || 0;
+          const bCarat = parseFloat(b.carat) || 0;
+          return bCarat - aCarat;
+        });
         break;
       case "featured":
         result.sort((a, b) => (b.isFeatured === a.isFeatured) ? 0 : b.isFeatured ? 1 : -1);
@@ -286,43 +372,9 @@ export default function GemCollectionPage() {
     setFilteredProducts(result);
   }, [searchTerm, selectedCategory, sortBy, priceRange, products]);
 
-  // Cart functions
+  // Cart functions - using context versions
   const addToCart = (product: GemstoneProduct) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.product.id === product.id);
-      if (existingItem) {
-        return prevItems.map(item => 
-          item.product.id === product.id 
-            ? { ...item, quantity: item.quantity + 1 } 
-            : item
-        );
-      } else {
-        return [...prevItems, { product, quantity: 1 }];
-      }
-    });
-  };
-
-  const removeFromCart = (productId: number) => {
-    setCartItems(prevItems => prevItems.filter(item => item.product.id !== productId));
-  };
-
-  const updateQuantity = (productId: number, quantity: number) => {
-    if (quantity < 1) return;
-    setCartItems(prevItems => 
-      prevItems.map(item => 
-        item.product.id === productId 
-          ? { ...item, quantity } 
-          : item
-      )
-    );
-  };
-
-  const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
-  };
-
-  const getTotalItems = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
+    contextAddToCart(product);
   };
 
   return (
@@ -506,9 +558,11 @@ export default function GemCollectionPage() {
                     <span className="text-amber-400">Total: </span>
                     <span className="text-white">${getTotalPrice().toFixed(2)}</span>
                   </div>
-                  <button className="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold rounded-lg hover:from-amber-700 hover:to-amber-800 transition-all shadow-lg shadow-amber-500/30">
-                    Proceed to Checkout
-                  </button>
+                  <Link href="/checkout">
+                    <button className="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold rounded-lg hover:from-amber-700 hover:to-amber-800 transition-all shadow-lg shadow-amber-500/30">
+                      Proceed to Checkout
+                    </button>
+                  </Link>
                 </div>
               </>
             )}
@@ -553,7 +607,7 @@ export default function GemCollectionPage() {
         ) : (
           <motion.div 
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: 50 }}
             className="text-center py-20"
           >
             <Gem className="h-16 w-16 text-amber-400 mx-auto mb-4" />
@@ -572,6 +626,48 @@ export default function GemCollectionPage() {
             </button>
           </motion.div>
         )}
+
+        {/* Jewelry Collection Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="mt-20"
+        >
+          <div className="text-center mb-12">
+            <div className="flex justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold text-amber-400 mb-6 tracking-wide drop-shadow-[0_0_15px_rgba(245,167,66,0.5)]">
+              Premium Jewelry Collection
+            </h1>
+            <p className="text-xl text-gray-200 max-w-3xl mx-auto">
+              Exquisite jewelry pieces featuring our finest gemstones, crafted with exceptional skill and attention to detail.
+            </p>
+          </div>
+
+          {/* Jewelry Products Grid */}
+          <motion.div 
+            layout
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+          >
+            {jewelryProducts.map((product, index) => (
+              <motion.div
+                key={product.id}
+                layout
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
+                <GemstoneProductCard product={product} onAddToCart={addToCart} />
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
 
         {/* Special Offer Section */}
         <motion.div
@@ -718,8 +814,6 @@ const GemstoneProductCard: React.FC<GemstoneProductCardProps> = ({ product, onAd
                     ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white hover:from-amber-700 hover:to-amber-800' 
                     : 'bg-gray-700 text-gray-400 cursor-not-allowed'
                 }`}
-                onClick={() => product.inStock && onAddToCart(product)}
-                disabled={!product.inStock}
               >
                 {product.inStock ? 'View Cart' : 'Out of Stock'}
               </motion.button>
